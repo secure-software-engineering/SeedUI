@@ -1,0 +1,9 @@
+[package]
+name = "sut_database"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+walkdir = "2"
+config = { path = "../config" }
+custom_types = { path = "../custom_types" }

@@ -1,0 +1,22 @@
+UserConfig(
+    target_info: TargetConfig(
+        target_path: "test_data/test_config_3.ron",
+        target_source_code_path: "./test_data",
+        target_include_filter: [],
+        allowed_extensions: [],
+    ),
+    fuzzer_infos: [
+        (
+            fuzzer_configuration_id: 1,
+            fuzzer_configuration: "./test_data",
+            traces_directory_path: "./test_data",
+            inputs_directory_path: "./test_data",
+        ),
+        (
+            fuzzer_configuration_id: 2,
+            fuzzer_configuration: "./test_data",
+            traces_directory_path: "./test_data",
+            inputs_directory_path: "./test_data",
+        )
+    ]
+)

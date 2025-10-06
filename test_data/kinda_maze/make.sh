@@ -1,0 +1,1 @@
+gcc -ggdb -I sources -o test_maze sources/test_maze.c

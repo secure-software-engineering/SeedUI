@@ -1,0 +1,10 @@
+[package]
+name = "inputs_database"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+trace_map = { path = "../trace_map" }
+config = { path = "../config" }
+custom_types = { path = "../custom_types" }
+sut_database = { path = "../sut_database" }

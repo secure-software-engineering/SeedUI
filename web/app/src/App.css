@@ -1,0 +1,92 @@
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.commonCoveredLineDecoration {
+	/* background: rgba(173, 216, 230, 0.5);
+	width: 5px !important;
+	margin-left: 5px; */
+  background: lightgreen;
+}
+
+.parentCoveredLineDecoration {
+	/* background: rgba(173, 216, 230, 0.5);
+	width: 5px !important;
+	margin-left: 5px; */
+  background: lightblue;
+}
+
+.childCoveredLineDecoration {
+	/* background: rgba(173, 216, 230, 0.5);
+	width: 5px !important;
+	margin-left: 5px; */
+  background: #FE9A37;
+}
+
+/* div.legendTooltip {
+		position: absolute;
+		text-align: center;
+		width: 120px;
+		padding: 2px;
+		font: 10px;
+		background: lightgrey;
+		border: 0px;
+		border-radius: 4px;
+		pointer-events: none;
+} */
+
+/* .slider-container {
+  max-width: 120px;
+  text-align: center;
+  margin-top: 5px;
+  margin-left: 5px;
+} */
+.slider {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 3px;
+  background: linear-gradient(to right, white, black);
+  border-radius: 5px;
+  outline: none;
+}
+.slider::-webkit-slider-thumb {
+  display: none; /* Hide the thumb */
+}
+.slider::-moz-range-thumb {
+  display: none; /* Hide the thumb for Firefox */
+}

@@ -1,0 +1,76 @@
+FROM ubuntu:22.04
+
+ARG LLVM_VERSION="14.0.6"
+
+RUN set -eux; \
+    apt-get update; \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y git cmake ninja-build ca-certificates busybox golang python3-distutils wget gcc-multilib build-essential curl file g++-multilib libcap-dev libgoogle-perftools-dev libncurses5-dev libsqlite3-dev libtcmalloc-minimal4 python3-pip unzip graphviz doxygen libboost-graph-dev nano autoconf autopoint libtool texinfo bison flex
+
+ENV PIP_NO_CACHE_DIR=0
+RUN python3 -m pip install -U pip
+
+RUN llvm_build_dir="$(mktemp -d)"; \
+    git clone https://github.com/llvm/llvm-project.git "${llvm_build_dir}"; \
+    cd "${llvm_build_dir}"; \
+    git checkout tags/llvmorg-14.0.6; \
+    cmake -S llvm -B build -G Ninja -DLLVM_ENABLE_PROJECTS='clang;clang-tools-extra;lld;lldb;' -DCMAKE_BUILD_TYPE='Release' -DLLVM_ENABLE_RUNTIMES="libcxx;libcxxabi;libunwind;compiler-rt" -DLLVM_INSTALL_UTILS=True -DLLVM_ENABLE_EH=ON -DLLVM_ENABLE_RTTI=ON -DLLVM_LINK_LLVM_DYLIB=ON -DLLVM_ENABLE_DUMP=ON -DLLVM_BUILD_EXAMPLES=OFF -DLLVM_INCLUDE_EXAMPLES=OFF -DLLVM_BUILD_TESTS=OFF -DLLVM_INCLUDE_TESTS=OFF -DLLVM_OPTIMIZED_TABLEGEN=True; \
+    cd build && ninja && ninja install; \
+    \
+    rm $(which ld); \
+    (cd "/usr/local/bin"; ln -s ld.lld ld); \
+    \
+    cd /; \
+    apt-get autoremove -y; \
+    apt-get clean -y; \
+    apt-get autoclean -y; \
+    rm -rf /var/lib/apt/lists/; \
+    rm -rf /tmp/* > /dev/null 2>&1; \
+    \
+    clang --version; \
+    ld --version
+
+ENV CMAKE_GENERATOR="Ninja" \
+    CC=clang \
+    CXX=clang++ \
+    LLVM_COMPILER_PATH=/usr/local/bin
+
+RUN pip3 install bs4
+
+WORKDIR /home/
+
+RUN git clone https://github.com/AFLplusplus/AFLplusplus.git GitAflplusplus; \
+    cd GitAflplusplus; \
+    git checkout b89727bea903aec80d003b6764fb53c232d33d95
+
+COPY external/rename_seeds.patch /home/GitAflplusplus
+
+RUN cd GitAflplusplus; \
+    git apply rename_seeds.patch; \
+    make
+
+# AFL++ settings
+ENV AFL_SKIP_CPUFREQ=1
+ENV AFL_TRY_AFFINITY=1
+ENV AFL_I_DONT_CARE_ABOUT_MISSING_CRASHES=1
+ENV AFL_NO_UI=1
+# ENV AFL_QUIET=1
+ENV AFL_LLVM_INSTRUMENT=CLASSIC
+
+RUN apt-get update && \
+    apt install -y autoconf automake autotools-dev libtool libssl-dev libglib2.0-dev
+
+RUN git clone git://sourceware.org/git/binutils-gdb.git
+
+RUN set -eux; \
+    cd binutils-gdb; \
+    mkdir build; \
+    cd build && \
+    CFLAGS="-Wno-error -DHAVE_SYS_STAT_H -DHAVE_SYS_WAIT_H -DHAVE_LIMITS_H -DHAVE_STDLIB_H -DHAVE_STRING_H -DHAVE_FCNTL_H" CC=/home/GitAflplusplus/afl-clang-fast CXX=/home/GitAflplusplus/afl-clang-fast++ ../configure --disable-shared --disable-gdb --disable-gdbserver --disable-gdbsupport --disable-libdecnumber --disable-ld --disable-gold --disable-gprof --disable-gprofng --disable-gas --disable-cpu --disable-intl --disable-libctf --disable-zlib --disable-texinfo --disable-sim --disable-readline --disable-libbacktrace; \
+    make clean && make
+
+
+# Seeds taken from https://github.com/HexHive/fuzzing-seed-selection/tree/main/fuzzing/readelf/seeds
+COPY examples/readelf/docker/seeds /home/seeds
+COPY examples/readelf/docker/readelf.sh /home/
+
+RUN chmod +x /home/readelf.sh

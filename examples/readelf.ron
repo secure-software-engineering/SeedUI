@@ -1,0 +1,22 @@
+UserConfig(
+    target_info: TargetConfig(
+        target_path: "../examples/readelf/local/binutils-gdb/build/binutils/readelf",
+        target_source_code_path: "../examples/readelf/local/binutils-gdb/binutils/",
+        target_include_filter: ["../examples/readelf/local/binutils-gdb/binutils/"],
+        allowed_extensions: ["c", "cpp"],
+    ),
+    fuzzer_infos: [
+        (
+            fuzzer_configuration_id: 1,
+            fuzzer_configuration: "run1",
+            traces_directory_path: "../examples/readelf/traces/readelf_1",
+            inputs_directory_path: "../examples/readelf/saved_corpus/readelf_1",
+        ),
+        (
+            fuzzer_configuration_id: 2,
+            fuzzer_configuration: "run2",
+            traces_directory_path: "../examples/readelf/traces/readelf_2",
+            inputs_directory_path: "../examples/readelf/saved_corpus/readelf_2",
+        )
+    ]
+)

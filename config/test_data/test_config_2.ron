@@ -1,0 +1,7 @@
+UserConfig(
+    target_info: TargetConfig(
+        target_path: "test_data/test_config_2.ron",
+        target_source_code_path: "./test_data",
+    ),
+    fuzzer_infos: []
+)
