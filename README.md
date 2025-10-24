@@ -62,6 +62,7 @@ There are three steps to run SeedUI, as follows:
   ```
   cd web
   npm install
+  npm run build
   npm start
   ```
   
