@@ -93,12 +93,12 @@ We recommend running the fuzzing campaign in a docker container using the follow
     cd examples/readelf
     docker-compose up -d
     ```
-  - Fuzz `readelf` for desired amount of time. Our example script `examples/readelf/docker/readelf.sh` timeouts after 5 minutes (you can edit the value for -V command line argument in line 22 and provide the desired amount of time in seconds).
+  - Fuzz `readelf` for desired amount of time. Our example script `examples/readelf/docker/readelf_afl.sh` timeouts after 5 minutes (you can edit the value for -V command line argument in line 22 and provide the desired amount of time in seconds).
     ```
     # First fuzzing campaign
-    docker exec -it readelf_example_1 /bin/bash /home/readelf.sh /home/seeds/cmin-seeds-1
+    docker exec -it readelf_example_1 /bin/bash /home/readelf_afl.sh /home/seeds/cmin-seeds-1
     # Second fuzzing campaign
-    docker exec -it readelf_example_2 /bin/bash /home/readelf.sh /home/seeds/cmin-seeds-2
+    docker exec -it readelf_example_2 /bin/bash /home/readelf_afl.sh /home/seeds/cmin-seeds-2
     ```
   - Copy the generated corpus into host machines:
     ```
