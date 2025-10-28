@@ -42,10 +42,10 @@ RUN git clone https://github.com/AFLplusplus/AFLplusplus.git GitAflplusplus; \
     cd GitAflplusplus; \
     git checkout b89727bea903aec80d003b6764fb53c232d33d95
 
-COPY external/rename_seeds.patch /home/GitAflplusplus
+COPY external/rename_seeds_afl.patch /home/GitAflplusplus
 
 RUN cd GitAflplusplus; \
-    git apply rename_seeds.patch; \
+    git apply rename_seeds_afl.patch; \
     make
 
 # AFL++ settings

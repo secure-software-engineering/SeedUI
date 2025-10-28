@@ -10,7 +10,7 @@ A demonstration of SeedUI is available in [YouTube](https://youtu.be/qpPjutmIcTs
 
 ## Pre-requisites:
   - [Rust](https://www.rust-lang.org/tools/install)
-  - [AflPlusPlus](https://github.com/AFLplusplus/AFLplusplus) compiled after applying `external/rename_seeds.patch`.
+  - [AflPlusPlus](https://github.com/AFLplusplus/AFLplusplus) compiled after applying `external/rename_seeds_afl.patch`.
   - [LLVM](https://github.com/llvm/llvm-project) >= 14.0.6
   - [npm](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm)
 
