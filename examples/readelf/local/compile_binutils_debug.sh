@@ -1,6 +1,6 @@
 #!/bin/bash
 
-git clone git://sourceware.org/git/binutils-gdb.git
+git clone --depth 1 -b binutils-2_45 https://github.com/bminor/binutils-gdb.git
 
 set -eux; \
     cd binutils-gdb; \
