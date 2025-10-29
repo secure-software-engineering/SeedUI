@@ -1,11 +1,29 @@
 version: '3.9'
 
 services:
-  example:
+  afl_run:
     image: readelf_seed_ui
     command: /bin/bash
     tty: true
-    scale: 2
+    scale: 1
+    ulimits:
+      nofile:
+        soft: 1000000
+        hard: 1000000
+    deploy:
+      resources:
+        limits:
+          cpus: "2"
+          memory: 2G
+        reservations:
+          cpus: "2"
+          memory: 2G
+  
+  hfuzz_run:
+    image: readelf_seed_ui
+    command: /bin/bash
+    tty: true
+    scale: 1
     ulimits:
       nofile:
         soft: 1000000

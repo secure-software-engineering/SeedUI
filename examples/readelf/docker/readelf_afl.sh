@@ -19,4 +19,4 @@ export AFL_LLVM_INSTRUMENT=CLASSIC
 
 export DRIVER_DIR="${SUBJECT}/obj-afl"
 
-$AFL/afl-fuzz -i "$1" -o "$DRIVER_DIR/afl-out" -V 300 -- "${SUBJECT}/build/binutils/readelf" -a @@
+$AFL/afl-fuzz -i "$1" -o "$DRIVER_DIR/afl-out" -V $2 -- "${SUBJECT}/build/binutils/readelf" -a @@
