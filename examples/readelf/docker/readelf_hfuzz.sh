@@ -2,7 +2,7 @@
 
 cd /home
 
-export SUBJECT="/home/binutils-gdb"
+export SUBJECT="/home/binutils-gdb-hfuzz"
 
 cd "${SUBJECT}"
 

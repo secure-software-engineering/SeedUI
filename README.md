@@ -96,16 +96,16 @@ We recommend running the fuzzing campaign in a docker container using the follow
   - Fuzz `readelf` for desired amount of time. Our example script `examples/readelf/docker/readelf_afl.sh` timeouts after 5 minutes (you can edit the value for -V command line argument in line 22 and provide the desired amount of time in seconds).
     ```
     # First fuzzing campaign
-    docker exec -it readelf_example_1 /bin/bash /home/readelf_afl.sh /home/seeds/cmin-seeds-1
+    docker exec -it readelf-afl_run-1 /bin/bash /home/readelf_afl.sh /home/seeds/cmin-seeds-1 300
     # Second fuzzing campaign
-    docker exec -it readelf_example_2 /bin/bash /home/readelf_afl.sh /home/seeds/cmin-seeds-2
+    docker exec -it readelf-hfuzz_run-1 /bin/bash /home/readelf_hfuzz.sh /home/seeds/cmin-seeds-2 300
     ```
   - Copy the generated corpus into host machines:
     ```
     cd examples/readelf
-    mkdir inputs
-    docker cp readelf_example_1:/home/binutils-gdb/obj-afl/afl-out inputs/readelf_1
-    docker cp readelf_example_2:/home/binutils-gdb/obj-afl/afl-out inputs/readelf_2
+    mkdir -p fuzzing_campaigns/inputs
+    docker cp readelf-afl_run-1:/home/binutils-gdb/obj-afl/afl-out fuzzing_campaigns/inputs/readelf_afl
+    docker cp readelf-hfuzz_run-1:/home/binutils-gdb-hfuzz/obj-hfuzz/hfuzz-out fuzzing_campaigns/inputs/readelf_hfuzz
     ```
   - Stop the docker containers:
     ```
