@@ -1,5 +1,16 @@
+diff --git a/.gitignore b/.gitignore
+index c72e57c3..30671e57 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -14,3 +14,5 @@ libs
+ obj
+ examples/badcode/targets/badcode1
+ examples/badcode/targets/badcode2
++kts_examples
++kts_examples/binutils-gdb
+\ No newline at end of file
 diff --git a/input.c b/input.c
-index a1063a38..9c8a7152 100644
+index a1063a38..e78108eb 100644
 --- a/input.c
 +++ b/input.c
 @@ -22,6 +22,7 @@
@@ -10,15 +21,7 @@ index a1063a38..9c8a7152 100644
  #include <dirent.h>
  #include <errno.h>
  #include <fcntl.h>
-@@ -37,6 +38,7 @@
- #include <unistd.h>
- 
- #include "fuzz.h"
-+#include "honggfuzz.h"
- #include "libhfcommon/common.h"
- #include "libhfcommon/files.h"
- #include "libhfcommon/log.h"
-@@ -320,21 +322,47 @@ bool input_parseBlacklist(honggfuzz_t* hfuzz) {
+@@ -320,28 +321,44 @@ bool input_parseBlacklist(honggfuzz_t* hfuzz) {
      return true;
  }
  
@@ -29,37 +32,27 @@ index a1063a38..9c8a7152 100644
 +    return (long long)spec.tv_sec * 1000 + (long long)spec.tv_nsec / 1000000;
 +}
 +
-+static void input_generateFileName(dynfile_t* dynfile, const char* dir, char fname[PATH_MAX], run_t* run) {
++static void input_generateFileName(
++    dynfile_t* dynfile, const char* dir, char fname[PATH_MAX], run_t* run) {
      uint64_t crc64f = util_CRC64(dynfile->data, dynfile->size);
      uint64_t crc64r = util_CRC64Rev(dynfile->data, dynfile->size);
-+    char     src_str[24];
-+    char     cycle_prefix[24] = "";
-+
-+    if (dynfile->src) {
-+        snprintf(src_str, sizeof(src_str), ",src:%zu", dynfile->src->idx);
-+        strcpy(cycle_prefix, "cycle:0,");
-+    } else {
-+        snprintf(src_str, sizeof(src_str), ",orig");
-+    }
-+    
      if (dir) {
 -        snprintf(fname, PATH_MAX, "%s/%016" PRIx64 "%016" PRIx64 ".%08" PRIx32 ".honggfuzz.cov",
 -            dir, crc64f, crc64r, (uint32_t)dynfile->size);
 +        snprintf(fname, PATH_MAX,
-+            "%s/%s"
-+            "id:%zu%s,executed_on:%lld,edges_found:%lu,%"
++            "%s/"
++            "id:%zu,executed_on:%lld,edges_found:%lu,%"
 +            "016" PRIx64 "%016" PRIx64 ".%08" PRIx32 ".honggfuzz.cov",
-+            dir, cycle_prefix, dynfile->idx, src_str, current_timestamp(),
++            dir, dynfile->idx, current_timestamp(),
 +            run->global->feedback.hwCnts.softCntEdge, crc64f, crc64r,
 +            (uint32_t)dynfile->size);
      } else {
 -        snprintf(fname, PATH_MAX, "%016" PRIx64 "%016" PRIx64 ".%08" PRIx32 ".honggfuzz.cov",
 -            crc64f, crc64r, (uint32_t)dynfile->size);
 +        snprintf(fname, PATH_MAX,
-+            "%s"
-+            "id:%zu%s,executed_on:%lld,edges_found:%lu,%"
++            "id:%zu,executed_on:%lld,edges_found:%lu,%"
 +            "016" PRIx64 "%016" PRIx64 ".%08" PRIx32 ".honggfuzz.cov",
-+            cycle_prefix, dynfile->idx, src_str, current_timestamp(),
++            dynfile->idx, current_timestamp(),
 +            run->global->feedback.hwCnts.softCntEdge, crc64f, crc64r,
 +            (uint32_t)dynfile->size);
      }
@@ -73,7 +66,15 @@ index a1063a38..9c8a7152 100644
  
      if (files_exists(fname)) {
          LOG_D("File '%s' already exists in the output corpus directory '%s'", fname, dir);
-@@ -384,11 +412,9 @@ void input_addDynamicInput(run_t* run) {
+         return true;
+     }
+ 
+-    LOG_D("Adding file '%s' to the corpus directory '%s'", fname, dir);
++    LOG_I("Adding file '%s' to the corpus directory '%s' from source '%s'", fname, dir, run->dynfile->path);
+ 
+     if (!files_writeBufToFile(
+             fname, dynfile->data, dynfile->size, O_WRONLY | O_CREAT | O_EXCL | O_CLOEXEC)) {
+@@ -384,11 +401,9 @@ void input_addDynamicInput(run_t* run) {
      }
      dynfile->phase    = fuzz_getState(run->global);
      dynfile->timedout = run->tmOutSignaled;
@@ -86,20 +87,20 @@ index a1063a38..9c8a7152 100644
  
      run->global->feedback.maxCov[0] = HF_MAX(run->global->feedback.maxCov[0], dynfile->cov[0]);
      run->global->feedback.maxCov[1] = HF_MAX(run->global->feedback.maxCov[1], dynfile->cov[1]);
-@@ -397,6 +423,12 @@ void input_addDynamicInput(run_t* run) {
+@@ -396,6 +411,12 @@ void input_addDynamicInput(run_t* run) {
+     run->global->feedback.maxCov[3] = HF_MAX(run->global->feedback.maxCov[3], dynfile->cov[3]);
  
      run->global->io.dynfileqMaxSz = HF_MAX(run->global->io.dynfileqMaxSz, dynfile->size);
- 
-+    input_generateFileName(dynfile, NULL, dynfile->path, run);
-+
++    
 +    MX_SCOPED_RWLOCK_WRITE(&run->global->mutex.dynfileq);
-+
++    
 +    dynfile->idx = ATOMIC_PRE_INC(run->global->io.dynfileqCnt);
-+
++    
++    input_generateFileName(dynfile, NULL, dynfile->path, run);
+ 
      /* Sort it by coverage - put better coverage earlier in the list */
      dynfile_t* iter = NULL;
-     TAILQ_FOREACH_HF (iter, &run->global->io.dynfileq, pointers) {
-@@ -416,7 +448,7 @@ void input_addDynamicInput(run_t* run) {
+@@ -416,7 +437,7 @@ void input_addDynamicInput(run_t* run) {
  
      const char* outDir =
          run->global->io.outputDir ? run->global->io.outputDir : run->global->io.inputDir;
@@ -108,7 +109,7 @@ index a1063a38..9c8a7152 100644
          LOG_E("Couldn't save the coverage data to '%s'", run->global->io.outputDir);
      }
  
-@@ -427,7 +459,7 @@ void input_addDynamicInput(run_t* run) {
+@@ -427,7 +448,7 @@ void input_addDynamicInput(run_t* run) {
  
      ATOMIC_POST_INC(run->global->io.newUnitsAdded);
  
