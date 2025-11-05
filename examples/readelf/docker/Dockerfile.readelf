@@ -95,6 +95,7 @@ RUN set -eux; \
 COPY examples/readelf/docker/seeds /home/seeds
 COPY examples/readelf/docker/readelf_afl.sh /home/
 COPY examples/readelf/docker/readelf_hfuzz.sh /home/
+COPY external/post_process_honggfuzz_inputs.py /home/
 
 RUN chmod +x /home/readelf_afl.sh
 RUN chmod +x /home/readelf_hfuzz.sh
