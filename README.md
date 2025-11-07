@@ -20,7 +20,7 @@ A demonstration of SeedUI is available in [YouTube](https://youtu.be/qpPjutmIcTs
 
 ## SeedUI in action (short)
 In general, a corpus should be extracted from fuzzing campaigns (more information in [run-fuzzers](#1-run-fuzzing-campaigns)).
-However, to quickly look at SeedUI, we provide a fuzzing corpora that is extracted from two AFL++ fuzzing campaigns of 5 minutes on `readelf`.
+However, to quickly look at SeedUI, we provide a fuzzing corpora that is extracted from 5 minutes fuzzing campaigns of AFL++ and Honggfuzz on `readelf`.
 We will use this saved corpus in the following steps.
 
 There are three steps to run SeedUI, as follows:
@@ -44,7 +44,6 @@ There are three steps to run SeedUI, as follows:
       cd examples/readelf/
       unzip saved_corpus.zip
 
-      mkdir traces
       python3 extract_binary_traces.py
       ```
 
