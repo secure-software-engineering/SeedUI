@@ -21,9 +21,9 @@ We recommend running the fuzzing campaign in a docker container using the follow
     docker-compose up -d
     ```
     We have configured the default timeout of 5 minutes. One can change it to the desired timeout by updating the last command line parameter to the `readelf_afl.sh` script in `examples/readelf/docker-compose.yaml` file.
-  - After the fuzzing campaign, the generated corpus for the fuzzing run can be found in the `examples/readelf/fuzzing_campaigns`. You may need to modify the folder permissions to access the files using the following command,
+  - After the fuzzing campaign, the generated corpus for the fuzzing run can be found in the `examples/readelf/saved_corpus`. You may need to modify the folder permissions to access the files using the following command,
     ```
-    sudo chmod -R 775 fuzzing_campaigns/*
+    sudo chmod -R 775 saved_corpus/*
     ```
   - Stop the docker containers:
     ```
