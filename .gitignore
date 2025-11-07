@@ -1,5 +1,9 @@
 target
+external/GitAflplusplus
+targets
+**/fuzzing_campaigns
 .idea
 .vscode
 **/inputs
 **/traces
+**/binutils-gdb
