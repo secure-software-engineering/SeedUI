@@ -8,15 +8,15 @@ UserConfig(
     fuzzer_infos: [
         (
             fuzzer_configuration_id: 1,
-            fuzzer_configuration: "run1",
-            traces_directory_path: "../examples/readelf/traces/readelf_1",
-            inputs_directory_path: "../examples/readelf/saved_corpus/readelf_1",
+            fuzzer_configuration: "afl++",
+            traces_directory_path: "../examples/readelf/saved_corpus/afl_traces",
+            inputs_directory_path: "../examples/readelf/saved_corpus/afl_run/afl-out/default/queue",
         ),
         (
             fuzzer_configuration_id: 2,
-            fuzzer_configuration: "run2",
-            traces_directory_path: "../examples/readelf/traces/readelf_2",
-            inputs_directory_path: "../examples/readelf/saved_corpus/readelf_2",
+            fuzzer_configuration: "hfuzz",
+            traces_directory_path: "../examples/readelf/saved_corpus/hfuzz_traces",
+            inputs_directory_path: "../examples/readelf/saved_corpus/hfuzz_run/renamed_seeds",
         )
     ]
 )
