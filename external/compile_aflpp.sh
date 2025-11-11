@@ -3,8 +3,8 @@
 git clone https://github.com/AFLplusplus/AFLplusplus.git GitAflplusplus
 cd GitAflplusplus
 git checkout b89727bea903aec80d003b6764fb53c232d33d95
-cp ../rename_seeds.patch .
-git apply rename_seeds.patch
+cp ../rename_seeds_afl.patch .
+git apply rename_seeds_afl.patch
 
 CC=clang CXX=clang++ make
 cd qemu_mode

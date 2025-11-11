@@ -1,11 +1,36 @@
-version: '3.9'
-
 services:
-  example:
+  afl_run:
     image: readelf_seed_ui
-    command: /bin/bash
     tty: true
-    scale: 2
+    scale: 1
+    volumes:
+      - ./saved_corpus/afl_run/:/home/binutils-gdb/obj-afl
+    command: bash -c "
+              cd /home/ && bash readelf_afl.sh /home/seeds/cmin-seeds-1 300
+            "
+    ulimits:
+      nofile:
+        soft: 1000000
+        hard: 1000000
+    deploy:
+      resources:
+        limits:
+          cpus: "2"
+          memory: 2G
+        reservations:
+          cpus: "2"
+          memory: 2G
+  
+  hfuzz_run:
+    image: readelf_seed_ui
+    volumes:
+      - ./saved_corpus/hfuzz_run/:/home/binutils-gdb-hfuzz/obj-hfuzz
+    command: bash -c "
+              cd /home/ && bash readelf_hfuzz.sh /home/seeds/cmin-seeds-1 300 && 
+              python3 post_process_honggfuzz_inputs.py --hfuzz-out=/home/binutils-gdb-hfuzz/obj-hfuzz/hfuzz-out --hfuzz-log=/home/binutils-gdb-hfuzz/obj-hfuzz/hfuzz.log --initial-seeds=/home/seeds/cmin-seeds-1 --output-folder=/home/binutils-gdb-hfuzz/obj-hfuzz/renamed_seeds
+            "
+    tty: true
+    scale: 1
     ulimits:
       nofile:
         soft: 1000000

@@ -42,10 +42,10 @@ RUN git clone https://github.com/AFLplusplus/AFLplusplus.git GitAflplusplus; \
     cd GitAflplusplus; \
     git checkout b89727bea903aec80d003b6764fb53c232d33d95
 
-COPY external/rename_seeds.patch /home/GitAflplusplus
+COPY external/rename_seeds_afl.patch /home/GitAflplusplus
 
 RUN cd GitAflplusplus; \
-    git apply rename_seeds.patch; \
+    git apply rename_seeds_afl.patch; \
     make
 
 # AFL++ settings
@@ -56,10 +56,22 @@ ENV AFL_NO_UI=1
 # ENV AFL_QUIET=1
 ENV AFL_LLVM_INSTRUMENT=CLASSIC
 
+RUN apt-get update && apt-get install -y binutils-dev libblocksruntime-dev libunwind-dev
+
+RUN git clone https://github.com/google/honggfuzz.git GitHonggfuzz; \
+    cd GitHonggfuzz; \
+    git checkout 7c495f834b3c4e25bd4d1b21239a404761bbb29c
+
+COPY external/rename_seeds_honggfuzz.patch /home/GitHonggfuzz
+
+RUN cd GitHonggfuzz; \
+    git apply rename_seeds_honggfuzz.patch; \
+    make
+
 RUN apt-get update && \
     apt install -y autoconf automake autotools-dev libtool libssl-dev libglib2.0-dev
 
-RUN git clone git://sourceware.org/git/binutils-gdb.git
+RUN git clone --depth 1 -b binutils-2_45 https://github.com/bminor/binutils-gdb.git
 
 RUN set -eux; \
     cd binutils-gdb; \
@@ -68,9 +80,22 @@ RUN set -eux; \
     CFLAGS="-Wno-error -DHAVE_SYS_STAT_H -DHAVE_SYS_WAIT_H -DHAVE_LIMITS_H -DHAVE_STDLIB_H -DHAVE_STRING_H -DHAVE_FCNTL_H" CC=/home/GitAflplusplus/afl-clang-fast CXX=/home/GitAflplusplus/afl-clang-fast++ ../configure --disable-shared --disable-gdb --disable-gdbserver --disable-gdbsupport --disable-libdecnumber --disable-ld --disable-gold --disable-gprof --disable-gprofng --disable-gas --disable-cpu --disable-intl --disable-libctf --disable-zlib --disable-texinfo --disable-sim --disable-readline --disable-libbacktrace; \
     make clean && make
 
+RUN git clone --depth 1 -b binutils-2_45 https://github.com/bminor/binutils-gdb.git binutils-gdb-hfuzz
+
+RUN apt-get install -y libc++-dev 
+
+RUN set -eux; \
+    cd binutils-gdb-hfuzz; \
+    mkdir build; \
+    cd build && \
+    CFLAGS="-Wno-error -DHAVE_SYS_STAT_H -DHAVE_SYS_WAIT_H -DHAVE_LIMITS_H -DHAVE_STDLIB_H -DHAVE_STRING_H -DHAVE_FCNTL_H" CC=/home/GitHonggfuzz/hfuzz_cc/hfuzz-clang CXX=/home/GitHonggfuzz/hfuzz_cc/hfuzz-clang++ ../configure --disable-shared --disable-gdb --disable-gdbserver --disable-gdbsupport --disable-libdecnumber --disable-ld --disable-gold --disable-gprof --disable-gprofng --disable-gas --disable-cpu --disable-intl --disable-libctf --disable-zlib --disable-texinfo --disable-sim --disable-readline --disable-libbacktrace; \
+    make clean && make
 
 # Seeds taken from https://github.com/HexHive/fuzzing-seed-selection/tree/main/fuzzing/readelf/seeds
 COPY examples/readelf/docker/seeds /home/seeds
-COPY examples/readelf/docker/readelf.sh /home/
+COPY examples/readelf/docker/readelf_afl.sh /home/
+COPY examples/readelf/docker/readelf_hfuzz.sh /home/
+COPY external/post_process_honggfuzz_inputs.py /home/
 
-RUN chmod +x /home/readelf.sh
+RUN chmod +x /home/readelf_afl.sh
+RUN chmod +x /home/readelf_hfuzz.sh

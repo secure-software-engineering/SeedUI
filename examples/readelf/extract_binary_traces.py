@@ -7,9 +7,9 @@ BINARY = Path("./local/binutils-gdb/build/binutils/readelf")
 QEMU_BIN = Path("../../external/GitAflplusplus/afl-qemu-trace")
 QEMU_PLUGIN_DIR = Path(f"{QEMU_BIN.parent}/qemu_mode/qemuafl/build/contrib/plugins/libdrcov.so")
 
-for item in ["readelf_1", "readelf_2"]:
-    INPUTS_DIR = Path(f"./saved_corpus/{item}")
-    TRACE_DIR = Path(f"./traces/{item}")
+for item in [("./saved_corpus/afl_run/afl-out/default/queue", "./saved_corpus/afl_traces"), ("./saved_corpus/hfuzz_run/renamed_seeds", "./saved_corpus/hfuzz_traces")]:
+    INPUTS_DIR = Path(item[0])
+    TRACE_DIR = Path(item[1])
     if not TRACE_DIR.exists():
         os.makedirs(TRACE_DIR, exist_ok=False)
         
